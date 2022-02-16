@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  cstore_nginx:
+    build:
+      context: ../
+      dockerfile: ./docker/services/nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./services/nginx/sites-available:/etc/nginx/sites-available
+      - ./services/nginx/logs/backend:/var/log/nginx/backend
+    depends_on:
+      - cstore_backend
+    networks:
+      - cstore
+
+  cstore_backend:
+    build:
+      context: ../
+      dockerfile: ./docker/services/backend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    volumes:
+      - ../services/backend:/backend
+      - ${GOPATH:-../gopath}:/go
+    env_file:
+      - services/common.env
+      - services/backend/.env
+    networks:
+      - cstore
+
+  #cstore_android_app:
+  #  build:
+  #    context: ../
+  #    dockerfile: ./docker/services/android_app/Dockerfile
+  #  restart: unless-stopped
+  #  volumes:
+  #    - ../services/android_app:/android_app
+  #  env_file:
+  #    - services/common.env
+  #    - services/android_app/.env
+  #  networks:
+  #    - cstore
+
+  cstore_phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - cstore_mysql
+    networks:
+      - cstore
+
+  cstore_mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    env_file:
+      - services/mysql/.env
+    volumes:
+      - ./services/mysql/data:/var/lib/mysql
+    networks:
+      - cstore
+
+networks:
+  cstore:
+    driver: bridge

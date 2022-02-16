@@ -1,0 +1,7 @@
+.idea
+tmp
+logs
+
+services/android_app
+services/backend/app
+docker/services/mysql/data
