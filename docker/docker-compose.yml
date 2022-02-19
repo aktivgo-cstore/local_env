@@ -15,7 +15,9 @@ services:
       - ./services/nginx/logs/cart_api:/var/log/nginx/cart_api
       - ./services/nginx/logs/store_api:/var/log/nginx/store_api
     depends_on:
-      - cstore_backend
+      - cstore_users_api
+      - cstore_store_api
+      - cstore_cart_api
     networks:
       - cstore
 
@@ -30,15 +32,15 @@ services:
       - ../services/users_api:/users_api
       - ${GOPATH:-../gopath}:/go
     env_file:
-      - services/common.env
-      - services/users_api/.env
+      - ./services/common.env
+      - ./services/users_api/.env
     networks:
       - cstore
 
   cstore_store_api:
     build:
       context: ../
-      dockerfile: services/cart_api/Dockerfile
+      dockerfile: ./docker/services/store_api/Dockerfile
     restart: unless-stopped
     ports:
       - "8083:8083"
@@ -46,8 +48,8 @@ services:
       - ../services/store_api:/store_api
       - ${GOPATH:-../gopath}:/go
     env_file:
-      - services/common.env
-      - services/cart_api/.env
+      - ./services/common.env
+      - ./services/store_api/.env
     networks:
       - cstore
 
@@ -62,8 +64,8 @@ services:
       - ../services/cart_api:/cart_api
       - ${GOPATH:-../gopath}:/go
     env_file:
-      - services/common.env
-      - services/cart_api/.env
+      - ./services/common.env
+      - ./services/cart_api/.env
     networks:
       - cstore
 
@@ -75,32 +77,45 @@ services:
   #  volumes:
   #    - ../services/android_app:/android_app
   #  env_file:
-  #    - services/common.env
-  #    - services/android_app/.env
+  #    - ./services/common.env
+  #    - ./services/android_app/.env
   #  networks:
   #    - cstore
 
-  #cstore_phpmyadmin:
-  #  image: phpmyadmin/phpmyadmin
-  #  ports:
-  #    - "8081:8081"
-  #  restart: unless-stopped
-  #  depends_on:
-  #    - cstore_mysql
-  #  networks:
-  #    - cstore
+  cstore_phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=cstore_mysql
+    depends_on:
+      - cstore_mysql
+    networks:
+      - cstore
 
-  #cstore_mysql:
-  #  image: mysql:latest
-  #  ports:
-  #    - "3306:3306"
-  #  restart: unless-stopped
-  #  env_file:
-  #    - services/mysql/.env
-  #  volumes:
-  #    - ./services/mysql/data:/var/lib/mysql
-  #  networks:
-  #    - cstore
+  cstore_mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    env_file:
+      - ./services/mysql/.env
+    volumes:
+      - ./services/mysql/data:/mysql/mysql-data
+    networks:
+      - cstore
+
+  cstore_mysql_init:
+    build:
+      context: ../
+      dockerfile: ./docker/services/mysql/init/Dockerfile
+    depends_on:
+      - cstore_mysql
+    networks:
+      - cstore
+
 
 networks:
   cstore:

@@ -6,4 +6,5 @@ services/android_app
 services/users_api/app
 services/store_api/app
 services/cart_api/app
+services/mysql/migrations
 docker/services/mysql/data
