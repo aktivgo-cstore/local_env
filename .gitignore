@@ -3,5 +3,7 @@ tmp
 logs
 
 services/android_app
-services/backend/app
+services/users_api/app
+services/store_api/app
+services/cart_api/app
 docker/services/mysql/data
