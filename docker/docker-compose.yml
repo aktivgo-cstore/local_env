@@ -85,7 +85,7 @@ services:
   cstore_phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8080:80"
+      - "8081:80"
     restart: unless-stopped
     environment:
       - PMA_ARBITRARY=1
