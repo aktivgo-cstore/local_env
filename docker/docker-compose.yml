@@ -5,7 +5,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/services/nginx/Dockerfile
-    restart: unless-stopped
+    restart: on-failure
     ports:
       - "80:80"
     volumes:
@@ -25,7 +25,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/services/users_api/Dockerfile
-    restart: unless-stopped
+    restart: on-failure
     ports:
       - "8082:8082"
     volumes:
@@ -34,6 +34,8 @@ services:
     env_file:
       - ./services/common.env
       - ./services/users_api/.env
+    depends_on:
+      - cstore_mysql
     networks:
       - cstore
 
@@ -41,7 +43,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/services/store_api/Dockerfile
-    restart: unless-stopped
+    restart: on-failure
     ports:
       - "8083:8083"
     volumes:
@@ -57,7 +59,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/services/cart_api/Dockerfile
-    restart: unless-stopped
+    restart: on-failure
     ports:
       - "8084:8084"
     volumes:
@@ -86,7 +88,7 @@ services:
     image: phpmyadmin/phpmyadmin
     ports:
       - "8081:80"
-    restart: unless-stopped
+    restart: on-failure
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=cstore_mysql
@@ -99,7 +101,7 @@ services:
     image: mysql:latest
     ports:
       - "3306:3306"
-    restart: unless-stopped
+    restart: on-failure
     env_file:
       - ./services/mysql/.env
     volumes:
@@ -111,11 +113,11 @@ services:
     build:
       context: ../
       dockerfile: ./docker/services/mysql/init/Dockerfile
+    restart: on-failure
     depends_on:
       - cstore_mysql
     networks:
       - cstore
-
 
 networks:
   cstore:
