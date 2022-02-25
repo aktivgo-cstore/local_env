@@ -20,10 +20,10 @@ status:
 	cd docker && docker-compose ps
 
 migrate_create:
-	./docker/utils/migrate create -ext sql -dir ./services/mysql/migrations -seq ${name}
+	migrate create -ext sql -dir ./services/mysql/migrations -seq ${name}
 
 migrate_up_all:
-	./docker/utils/migrate -path ./services/mysql/migrations -database mysql://dev:dev@localhost:3636/cstore up
+	migrate -path ./services/mysql/migrations -database "mysql://dev:dev@tcp(localhost:3306)/cstore" up
 
 migrate_down_all:
-	./docker/utils/migrate -path ./services/mysql/migrations -database mysql://dev:dev@tcp(localhost:3636)/cstore down
+	migrate -path ./services/mysql/migrations -database "mysql://dev:dev@tcp(localhost:3306)/cstore" down
