@@ -10,10 +10,10 @@ build:
 restart: down start
 
 init:
-	(git clone git@github.com:vyatsu-cstore/migrations.git ./services/mysql/migrations || true) && \
-	(git clone git@github.com:vyatsu-cstore/users_api.git ./services/users_api/app || true) && \
-	(git clone git@github.com:vyatsu-cstore/store_api.git ./services/store_api/app || true) && \
-	(git clone git@github.com:vyatsu-cstore/cart_api.git ./services/cart_api/app || true)
+	git clone https://github.com/vyatsu-cstore/migrations.git ./services/mysql/migrations && \
+	git clone https://github.com/vyatsu-cstore/users_api.git ./services/users_api/app && \
+	git clone https://github.com/vyatsu-cstore/store_api.git ./services/store_api/app && \
+	git clone https://github.com/vyatsu-cstore/cart_api.git ./services/cart_api/app
 
 status:
 	cd docker && docker-compose ps
